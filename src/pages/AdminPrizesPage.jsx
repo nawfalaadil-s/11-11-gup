@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import Toggle from '../components/Toggle';
+import { uploadPrizeMedia } from '../utils/paymentProof';
 
 const isVideo = (url) => !!url && /\.(mp4|webm|ogv|mov|m4v)(\?|$)/i.test(url);
 
@@ -11,6 +12,26 @@ export default function AdminPrizesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editingPrize, setEditingPrize] = useState(null);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [mediaError, setMediaError] = useState(null);
+
+  const handleMediaUpload = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    setMediaError(null);
+    setUploadingMedia(true);
+    try {
+      const result = await uploadPrizeMedia(file);
+      setEditingPrize((prev) =>
+        prev ? { ...prev, image_url: result.url, is_placeholder_image: false } : prev
+      );
+    } catch (err) {
+      setMediaError(err.message);
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
 
   useEffect(() => { loadPrizes(); }, []);
 
@@ -108,6 +129,31 @@ export default function AdminPrizesPage() {
                     Paste an image or video URL. Toggle placeholder off for real media.
                   </div>
                 </div>
+                <div className="admin-field">
+                  <label className="admin-label">Upload Media Directly</label>
+                  <input
+                    id="prizeMediaUpload"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/ogg,video/quicktime"
+                    onChange={handleMediaUpload}
+                    disabled={uploadingMedia}
+                    style={{ display: 'none' }}
+                  />
+                  <label
+                    htmlFor="prizeMediaUpload"
+                    className="admin-btn admin-btn-ghost"
+                    style={{ display: 'inline-block', cursor: uploadingMedia ? 'not-allowed' : 'pointer' }}
+                  >
+                    {uploadingMedia ? 'Uploading…' : 'Choose File'}
+                  </label>
+                  <div style={{ color: '#64748b', fontSize: '0.72rem', marginTop: '0.35rem' }}>
+                    JPG, PNG, WebP, GIF or video up to 50 MB.
+                  </div>
+                  {mediaError && (
+                    <div style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '0.35rem' }}>{mediaError}</div>
+                  )}
+                </div>
+
                 <div className="admin-field">
                   <Toggle
                     checked={editingPrize.is_placeholder_image || false}
