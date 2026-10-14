@@ -39,6 +39,19 @@ export default function AdminEntriesPage() {
       }
     };
 
+    const handleDeleteEntry = async (entry) => {
+      if (!confirm(`Delete entry ${entry.entry_code}? This cannot be undone.`)) return;
+      try {
+        const { data, error: err } = await supabase.rpc('delete_entry', { p_entry_id: entry.id });
+        if (err) throw err;
+        if (!data?.success) throw new Error(data?.error || 'Delete failed');
+        await loadEntries();
+      } catch (err) {
+        console.error(err);
+        alert(`Error: ${err.message}`);
+      }
+    };
+
   useEffect(() => {
     loadEntries();
   }, []);
@@ -292,6 +305,13 @@ export default function AdminEntriesPage() {
                         Token
                       </button>
                     )}
+                    <button
+                      onClick={() => handleDeleteEntry(entry)}
+                      className="admin-btn admin-btn-danger"
+                      style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </td>
               </tr>
