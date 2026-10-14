@@ -512,6 +512,8 @@ export default function RegisterPage() {
                  <img
                    src="/payment-qr.jpeg"
                    alt="Payment QR code"
+                   loading="lazy"
+                   decoding="async"
                    style={{
                      width: '200px', height: '200px', objectFit: 'contain',
                      borderRadius: '10px', background: '#fff', padding: '0.5rem',

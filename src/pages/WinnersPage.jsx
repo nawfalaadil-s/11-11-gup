@@ -7,6 +7,8 @@ import CountdownTimer from '../components/CountdownTimer';
 import BettaFish from '../components/BettaFish';
 import { formatDateTime } from '../utils/helpers';
 
+const isVideo = (url) => !!url && /\.(mp4|webm|ogv|mov|m4v)(\?|$)/i.test(url);
+
 const reveal = {
   hidden: { opacity: 0, y: 26 },
   show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
@@ -117,11 +119,24 @@ export default function WinnersPage() {
               </div>
               <div className="showcase-visual">
                 {prize.image_url && !prize.is_placeholder_image ? (
-                  <img
-                    src={prize.image_url}
-                    alt={prize.prize_name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
+                  isVideo(prize.image_url) ? (
+                    <video
+                      src={prize.image_url}
+                      controls
+                      preload="metadata"
+                      muted
+                      playsInline
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <img
+                      src={prize.image_url}
+                      alt={prize.prize_name}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  )
                 ) : (
                   <div style={{ width: '82%', maxWidth: '260px' }}>
                     <BettaFish

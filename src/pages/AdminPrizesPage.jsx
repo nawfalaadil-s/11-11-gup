@@ -4,6 +4,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import Toggle from '../components/Toggle';
 
+const isVideo = (url) => !!url && /\.(mp4|webm|ogv|mov|m4v)(\?|$)/i.test(url);
+
 export default function AdminPrizesPage() {
   const [prizes, setPrizes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -139,16 +141,33 @@ export default function AdminPrizesPage() {
                   alignItems: 'center', justifyContent: 'center',
                   border: '1px solid rgba(255,255,255,0.07)',
                 }}>
-                  {prize.image_url && !prize.is_placeholder_image ? (
-                    <img src={prize.image_url} alt={prize.prize_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ textAlign: 'center', padding: '1rem' }}>
-                      <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🐠</div>
-                      <p style={{ color: '#64748b', fontSize: '0.8rem' }}>
-                        {prize.is_placeholder_image ? 'Placeholder' : 'No image'}
-                      </p>
-                    </div>
-                  )}
+                   {prize.image_url && !prize.is_placeholder_image ? (
+                     isVideo(prize.image_url) ? (
+                       <video
+                         src={prize.image_url}
+                         controls
+                         preload="metadata"
+                         muted
+                         playsInline
+                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                       />
+                     ) : (
+                       <img
+                         src={prize.image_url}
+                         alt={prize.prize_name}
+                         loading="lazy"
+                         decoding="async"
+                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                       />
+                     )
+                   ) : (
+                     <div style={{ textAlign: 'center', padding: '1rem' }}>
+                       <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🐠</div>
+                       <p style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                         {prize.is_placeholder_image ? 'Placeholder' : 'No image'}
+                       </p>
+                     </div>
+                   )}
                 </div>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f0d060', textAlign: 'center', margin: '0 0 0.3rem' }}>
                   {prize.prize_name}
