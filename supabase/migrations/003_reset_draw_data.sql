@@ -13,10 +13,10 @@ BEGIN
   END IF;
 
   -- Always clear winners before touching entries.
-  DELETE FROM public.winners;
+  DELETE FROM public.winners WHERE true;
 
   IF p_delete_entries THEN
-    DELETE FROM public.entries;
+    DELETE FROM public.entries WHERE true;
     -- Storage objects cannot be deleted directly from SQL.
     -- Remove them from the Supabase Storage dashboard if needed.
   END IF;
