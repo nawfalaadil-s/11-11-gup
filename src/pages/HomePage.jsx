@@ -8,6 +8,8 @@ import BettaFish from '../components/BettaFish';
 import LuckySpin from '../components/LuckySpin';
 import { getRemainingSlots, isRegistrationOpen } from '../utils/helpers';
 
+const isVideo = (url) => !!url && /\.(mp4|webm|ogv|mov|m4v)(\?|$)/i.test(url);
+
 const FAQS = [
   {
     q: 'When will the draw take place?',
@@ -312,11 +314,24 @@ export default function HomePage() {
                 </div>
                 <div className="showcase-visual">
                   {prize.image_url && !prize.is_placeholder_image ? (
-                    <img
-                      src={prize.image_url}
-                      alt={prize.prize_name}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
+                    isVideo(prize.image_url) ? (
+                      <video
+                        src={prize.image_url}
+                        controls
+                        preload="metadata"
+                        muted
+                        playsInline
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <img
+                        src={prize.image_url}
+                        alt={prize.prize_name}
+                        loading="lazy"
+                        decoding="async"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    )
                   ) : (
                     <div style={{ width: '82%', maxWidth: '260px' }}>
                       <BettaFish
