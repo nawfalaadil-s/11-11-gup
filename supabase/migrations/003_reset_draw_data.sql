@@ -17,7 +17,8 @@ BEGIN
 
   IF p_delete_entries THEN
     DELETE FROM public.entries;
-    DELETE FROM storage.objects WHERE bucket_id = 'payment-screenshots';
+    -- Storage objects cannot be deleted directly from SQL.
+    -- Remove them from the Supabase Storage dashboard if needed.
   END IF;
 
   -- Reset draw state to "not executed".
