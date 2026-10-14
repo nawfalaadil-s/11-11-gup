@@ -18,7 +18,26 @@ export default function AdminEntriesPage() {
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [showProofModal, setShowProofModal] = useState(false);
-  const [tokenQR, setTokenQR] = useState(null);
+    const [tokenQR, setTokenQR] = useState(null);
+    const [deletingAll, setDeletingAll] = useState(false);
+
+    const handleDeleteAllEntries = async () => {
+      if (!confirm('Delete all entries and reset the draw? This cannot be undone.')) return;
+      if (!confirm('This will permanently remove every registration. Confirm again.')) return;
+      try {
+        setDeletingAll(true);
+        const { data, error: err } = await supabase.rpc('reset_draw_data', { p_delete_entries: true });
+        if (err) throw err;
+        if (!data?.success) throw new Error(data?.error || 'Delete failed');
+        await loadEntries();
+        alert('All entries deleted and draw reset.');
+      } catch (err) {
+        console.error(err);
+        alert(`Error: ${err.message}`);
+      } finally {
+        setDeletingAll(false);
+      }
+    };
 
   useEffect(() => {
     loadEntries();
@@ -160,7 +179,16 @@ export default function AdminEntriesPage() {
           <h1 className="admin-title">Manage Entries</h1>
           <p className="admin-subtitle">Review payments, verify entries, and issue tokens</p>
         </div>
-        <button onClick={exportToCSV} className="admin-btn admin-btn-gold">Export CSV</button>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button onClick={exportToCSV} className="admin-btn admin-btn-gold">Export CSV</button>
+          <button
+            onClick={handleDeleteAllEntries}
+            disabled={deletingAll}
+            className="admin-btn admin-btn-danger"
+          >
+            {deletingAll ? 'Deleting…' : 'Delete All Entries'}
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

@@ -14,6 +14,8 @@ export default function AdminDrawPage() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentPrize, setCurrentPrize] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [resettingDraw, setResettingDraw] = useState(false);
+  const [deletingAllEntries, setDeletingAllEntries] = useState(false);
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -93,6 +95,41 @@ export default function AdminDrawPage() {
       console.error('Draw execution error:', err);
       setError(err.message);
       setIsSpinning(false);
+    }
+  };
+
+  const handleResetDraw = async () => {
+    if (!confirm('Reset the draw? Winners will be removed but registrations will remain.')) return;
+    try {
+      setResettingDraw(true);
+      setError(null);
+      const { data, error: err } = await supabase.rpc('reset_draw_data', { p_delete_entries: false });
+      if (err) throw err;
+      if (!data?.success) throw new Error(data?.error || 'Reset failed');
+      await loadDrawData();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setResettingDraw(false);
+    }
+  };
+
+  const handleDeleteAllEntries = async () => {
+    if (!confirm('Delete all entries, winners, and reset the draw? This cannot be undone.')) return;
+    if (!confirm('This permanently removes every registration. Confirm again.')) return;
+    try {
+      setDeletingAllEntries(true);
+      setError(null);
+      const { data, error: err } = await supabase.rpc('reset_draw_data', { p_delete_entries: true });
+      if (err) throw err;
+      if (!data?.success) throw new Error(data?.error || 'Delete failed');
+      await loadDrawData();
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setDeletingAllEntries(false);
     }
   };
 
@@ -273,6 +310,27 @@ export default function AdminDrawPage() {
           <ErrorMessage message={error} />
         </div>
       )}
+
+      {/* Draw controls */}
+      <div className="admin-card" style={{ marginBottom: '1.2rem' }}>
+        <div className="admin-card-title">Draw Controls</div>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={handleResetDraw}
+            disabled={resettingDraw || deletingAllEntries}
+            className="admin-btn admin-btn-ghost"
+          >
+            {resettingDraw ? 'Resetting…' : 'Reset Draw'}
+          </button>
+          <button
+            onClick={handleDeleteAllEntries}
+            disabled={resettingDraw || deletingAllEntries}
+            className="admin-btn admin-btn-danger"
+          >
+            {deletingAllEntries ? 'Deleting…' : 'Delete All Entries'}
+          </button>
+        </div>
+      </div>
 
       {/* Status */}
       <div className="admin-card" style={{ marginBottom: '1.2rem' }}>

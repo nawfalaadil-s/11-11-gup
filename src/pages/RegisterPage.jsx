@@ -8,6 +8,8 @@ import BettaFish from '../components/BettaFish';
 import { validateFullName, validateMobileNumber, validateEmail } from '../utils/validation';
 import { isRegistrationOpen, getRemainingSlots } from '../utils/helpers';
 import { validateScreenshotFile, uploadPaymentScreenshot } from '../utils/paymentProof';
+import { generateTokenImage } from '../utils/tokenGenerator';
+import { generateQRCode, buildVerificationUrl } from '../utils/qrcode';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -25,8 +27,19 @@ export default function RegisterPage() {
   const [formErrors, setFormErrors] = useState({});
   const [screenshotFile, setScreenshotFile] = useState(null);
   const [screenshotPreview, setScreenshotPreview] = useState(null);
+  const [tokenQR, setTokenQR] = useState(null);
+  const [downloadingToken, setDownloadingToken] = useState(false);
 
   useEffect(() => { loadData(); }, []);
+
+  useEffect(() => {
+    if (!success) return;
+    let cancelled = false;
+    generateQRCode(buildVerificationUrl(success.entryCode)).then((qr) => {
+      if (!cancelled) setTokenQR(qr);
+    });
+    return () => { cancelled = true; };
+  }, [success]);
 
   const loadData = async () => {
     try {
@@ -112,6 +125,12 @@ export default function RegisterPage() {
       if (prev) URL.revokeObjectURL(prev);
       return null;
     });
+  };
+
+  const handleDownloadToken = async () => {
+    setDownloadingToken(true);
+    await generateTokenImage('issued-entry-token', `token-${success.entryCode}.png`);
+    setDownloadingToken(false);
   };
 
   const handleChange = (e) => {
@@ -209,6 +228,9 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex gap-2 justify-center flex-wrap">
+              <button onClick={handleDownloadToken} disabled={downloadingToken} className="btn-outline">
+                {downloadingToken ? 'Preparing…' : 'Download Token'}
+              </button>
               <button onClick={() => navigate('/verify/' + success.entryCode)} className="btn-gold">
                 Check My Status
               </button>
@@ -218,6 +240,52 @@ export default function RegisterPage() {
             </div>
           </div>
         </motion.div>
+
+        <div
+          id="issued-entry-token"
+          style={{
+            position: 'absolute', left: '-9999px', top: 0,
+            width: '420px', padding: '1.5rem', borderRadius: '12px',
+            background: '#0b1220', border: '1px solid rgba(212,175,55,0.4)',
+            color: '#e6eefb', boxSizing: 'border-box',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+            <p style={{ fontSize: '0.65rem', color: '#64748b', marginBottom: '0.4rem', letterSpacing: '0.12em' }}>
+              OFFICIAL LUCKY DRAW ENTRY
+            </p>
+            <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#f0d060', margin: '0 0 0.3rem' }}>
+              {eventSettings.event_name}
+            </h4>
+            <p style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d4af37' }}>
+              Hosted by {eventSettings.organizer_name}
+            </p>
+            <p style={{ fontSize: '0.7rem', color: '#64748b' }}>
+              Sponsored by {eventSettings.sponsor_name}
+            </p>
+          </div>
+          <div style={{ borderTop: '1px solid rgba(212,175,55,0.25)', borderBottom: '1px solid rgba(212,175,55,0.25)', padding: '1rem 0', margin: '1rem 0' }}>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.3rem' }}>Participant Name</p>
+            <p style={{ fontSize: '1rem', fontWeight: 600, color: '#f1f5f9', marginBottom: '1rem' }}>
+              {formData.fullName}
+            </p>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.3rem' }}>Entry Code</p>
+            <p style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f0d060', fontFamily: 'monospace', marginBottom: '1rem' }}>
+              {success.entryCode}
+            </p>
+            <p style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.3rem' }}>Payment Status</p>
+            <p style={{ fontSize: '1rem', fontWeight: 700, color: '#fbbf24' }}>PENDING VERIFICATION</p>
+          </div>
+          {tokenQR && (
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+              <img src={tokenQR} alt="QR Code" style={{ width: '8rem', height: '8rem' }} />
+            </div>
+          )}
+          <div style={{ textAlign: 'center', fontSize: '0.7rem', color: '#64748b' }}>
+            <p>Token Price: ₹{eventSettings.token_price}</p>
+            <p style={{ marginTop: '0.3rem' }}>Scan QR code to verify entry</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -429,10 +497,34 @@ export default function RegisterPage() {
                 <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f1f5f9' }}>Payment Proof</span>
                 <span className="badge badge-gold" style={{ fontSize: '0.62rem' }}>Optional</span>
               </div>
-              <p style={{ color: '#7d8ea6', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-                Pay ₹{eventSettings.token_price} first, then add your transaction ID and a screenshot of
-                the payment. This helps the admin verify you faster.
-              </p>
+               <p style={{ color: '#7d8ea6', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+                 Pay ₹{eventSettings.token_price} first, then add your transaction ID and a screenshot of
+                 the payment. This helps the admin verify you faster.
+               </p>
+
+               <div
+                 style={{
+                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem',
+                   marginBottom: '1rem', padding: '1rem', borderRadius: '12px',
+                   border: '1px solid rgba(212,175,55,0.2)', background: 'rgba(6,13,26,0.45)',
+                 }}
+               >
+                 <img
+                   src="/payment-qr.jpeg"
+                   alt="Payment QR code"
+                   style={{
+                     width: '200px', height: '200px', objectFit: 'contain',
+                     borderRadius: '10px', background: '#fff', padding: '0.5rem',
+                   }}
+                 />
+                 <p style={{ color: '#c9d4e0', fontSize: '0.82rem', fontWeight: 600, margin: 0 }}>
+                   Scan to pay ₹{eventSettings.token_price}
+                 </p>
+                 <p style={{ color: '#556677', fontSize: '0.72rem', margin: 0, textAlign: 'center' }}>
+                   UPI / payment QR — save the transaction ID from your payment app.
+                 </p>
+               </div>
+
 
               <div className="form-group" style={{ marginBottom: '1rem' }}>
                 <label className="form-label" htmlFor="transactionId">Transaction ID</label>
