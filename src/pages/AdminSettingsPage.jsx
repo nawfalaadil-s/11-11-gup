@@ -4,8 +4,16 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import Toggle from '../components/Toggle';
 
-const toLocalInput = (v) => (v ? new Date(v).toISOString().slice(0, 16) : '');
-const fromLocalInput = (v) => (v ? new Date(v).toISOString() : null);
+const toLocalInput = (v) => {
+  if (!v) return '';
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 16);
+};
+const fromLocalInput = (v) => {
+  if (!v) return null;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+};
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState(null);
@@ -130,16 +138,16 @@ export default function AdminSettingsPage() {
             <label className="admin-label">Token Price (₹)</label>
             <input
               type="number" className="admin-input" min="0"
-              value={settings.token_price}
-              onChange={(e) => handleChange('token_price', parseInt(e.target.value))}
+             value={settings.token_price}
+             onChange={(e) => handleChange('token_price', Math.max(0, parseInt(e.target.value, 10) || 0))}
             />
           </div>
           <div className="admin-field">
             <label className="admin-label">Maximum Participants</label>
             <input
               type="number" className="admin-input" min="1"
-              value={settings.max_participants}
-              onChange={(e) => handleChange('max_participants', parseInt(e.target.value))}
+             value={settings.max_participants}
+             onChange={(e) => handleChange('max_participants', Math.max(1, parseInt(e.target.value, 10) || 1))}
             />
           </div>
           <div className="admin-field">
@@ -162,8 +170,8 @@ export default function AdminSettingsPage() {
             <label className="admin-label">Minimum Age</label>
             <input
               type="number" className="admin-input" min="0"
-              value={settings.minimum_age || 18}
-              onChange={(e) => handleChange('minimum_age', parseInt(e.target.value))}
+             value={settings.minimum_age || 18}
+             onChange={(e) => handleChange('minimum_age', Math.max(0, parseInt(e.target.value, 10) || 0))}
             />
           </div>
         </div>

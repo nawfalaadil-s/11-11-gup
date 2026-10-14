@@ -228,8 +228,8 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex gap-2 justify-center flex-wrap">
-              <button onClick={handleDownloadToken} disabled={downloadingToken} className="btn-outline">
-                {downloadingToken ? 'Preparing…' : 'Download Token'}
+              <button onClick={handleDownloadToken} disabled={downloadingToken || !tokenQR} className="btn-outline">
+                {downloadingToken ? 'Preparing…' : tokenQR ? 'Download Token' : 'Preparing…'}
               </button>
               <button onClick={() => navigate('/verify/' + success.entryCode)} className="btn-gold">
                 Check My Status
