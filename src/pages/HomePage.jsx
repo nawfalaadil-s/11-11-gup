@@ -13,7 +13,7 @@ const isVideo = (url) => !!url && /\.(mp4|webm|ogv|mov|m4v)(\?|$)/i.test(url);
 const FAQS = [
   {
     q: 'When will the draw take place?',
-    a: 'The lucky draw will be conducted on 20 October 2026 at 11:11 AM IST. All verified entries participate automatically — there is nothing extra to do on draw day.',
+    a: 'The lucky draw will be conducted on 18 October 2026 at 11:11 AM IST. All verified entries participate automatically — there is nothing extra to do on draw day.',
   },
   {
     q: 'How are the winners selected?',
@@ -159,7 +159,7 @@ export default function HomePage() {
               <p className="hero-sub">
                 Three stunning exotic betta fish. ₹{eventSettings.token_price} per entry.
                 A maximum of {eventSettings.max_participants} participants. One fair,
-                server-verified draw on 20 October 2026 at 11:11 AM IST.
+                server-verified draw on 18 October 2026 at 11:11 AM IST.
               </p>
 
               <div className="hero-ctas">
@@ -519,3 +519,4 @@ export default function HomePage() {
     </div>
   );
 }
+

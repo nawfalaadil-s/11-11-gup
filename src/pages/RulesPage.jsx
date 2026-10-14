@@ -99,7 +99,7 @@ export default function RulesPage() {
         <InfoRow label="Event Name" value={settings.event_name} />
         <InfoRow label="Organizer" value={settings.organizer_name} />
         <InfoRow label="Sponsor" value={settings.sponsor_name} />
-        <InfoRow label="Draw Date" value="20 October 2026, 11:11 AM IST" />
+        <InfoRow label="Draw Date" value="18 October 2026, 11:11 AM IST" />
         <InfoRow label="Timezone" value={settings.timezone} />
       </RuleSection>
 
@@ -154,7 +154,7 @@ export default function RulesPage() {
             'Fair and transparent process',
             'Uses cryptographically secure random selection inside the database',
             'Limited to entries with verified payments only',
-            'Conducted on 20 October 2026 at 11:11 AM IST',
+            'Conducted on 18 October 2026 at 11:11 AM IST',
             'Immutable once executed — the draw runs exactly once',
             'The website animation never chooses a winner',
           ]}
@@ -229,3 +229,4 @@ export default function RulesPage() {
     </div>
   );
 }
+
