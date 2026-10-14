@@ -97,13 +97,16 @@ export default function AdminPrizesPage() {
                   />
                 </div>
                 <div className="admin-field">
-                  <label className="admin-label">Image URL</label>
+                  <label className="admin-label">Prize Media URL</label>
                   <input
                     type="url" className="admin-input"
                     value={editingPrize.image_url || ''}
                     onChange={(e) => setEditingPrize({ ...editingPrize, image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
+                    placeholder="https://example.com/media.mp4 or .jpg"
                   />
+                  <div className="admin-hint" style={{ color: '#64748b', fontSize: '0.75rem', marginTop: '0.3rem' }}>
+                    Paste an image or video URL. Toggle placeholder off for real media.
+                  </div>
                 </div>
                 <div className="admin-field">
                   <Toggle

@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
         .single();
 
       setIsAdmin(!error && !!data);
-    } catch (err) {
+    } catch {
       setIsAdmin(false);
     } finally {
       setLoading(false);
