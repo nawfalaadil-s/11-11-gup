@@ -65,12 +65,18 @@ export default function HomePage() {
     try {
       const [settingsRes, countRes, prizesRes] = await Promise.all([
         supabase.from('event_settings').select('*').single(),
-        supabase.from('entries').select('*', { count: 'exact', head: true }),
+        supabase.rpc('get_entries_count'),
         supabase.from('prizes').select('*').order('prize_number', { ascending: true }),
       ]);
 
       setEventSettings(settingsRes.data);
-      setTotalEntries(countRes.count || 0);
+      const countRaw = countRes.data;
+const count = typeof countRaw === 'number'
+  ? countRaw
+  : (Array.isArray(countRaw) && countRaw.length
+      ? (countRaw[0]?.get_entries_count ?? countRaw[0]?.count ?? 0)
+      : (countRaw?.get_entries_count ?? countRaw?.count ?? 0));
+setTotalEntries(typeof count === 'number' ? count : 0);
       setPrizes(prizesRes.data || []);
     } catch (err) {
       console.error('Error loading data:', err);

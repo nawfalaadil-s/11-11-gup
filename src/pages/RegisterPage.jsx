@@ -45,8 +45,13 @@ export default function RegisterPage() {
     try {
       const { data: s } = await supabase.from('event_settings').select('*').single();
       setEventSettings(s);
-      const { count } = await supabase.from('entries').select('*', { count: 'exact', head: true });
-      setTotalEntries(count || 0);
+      const { data: countData } = await supabase.rpc('get_entries_count');
+      const count = typeof countData === 'number'
+        ? countData
+        : (Array.isArray(countData) && countData.length
+            ? (countData[0]?.get_entries_count ?? countData[0]?.count ?? 0)
+            : (countData?.get_entries_count ?? countData?.count ?? 0));
+      setTotalEntries(typeof count === 'number' ? count : 0);
     } catch (err) {
       console.error(err);
     } finally {
@@ -95,6 +100,15 @@ export default function RegisterPage() {
       if (err) throw err;
       if (!data.success) throw new Error(data.error);
       setSuccess({ entryCode: data.entry_code, message: data.message, hasScreenshot: !!screenshot });
+      // Refresh the public register count now that a new entry exists.
+      supabase.rpc('get_entries_count').then(({ data: countData }) => {
+        const next = typeof countData === 'number'
+          ? countData
+          : (Array.isArray(countData) && countData.length
+              ? (countData[0]?.get_entries_count ?? countData[0]?.count ?? null)
+              : (countData?.get_entries_count ?? countData?.count ?? null));
+        if (typeof next === 'number') setTotalEntries(next);
+      }).catch(() => {});
     } catch (err) {
       setError(err.message);
     } finally {
