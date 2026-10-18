@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const DRAW_DATE = new Date('2026-10-18T11:11:00+05:30');
+const DRAW_DATE = new Date('2026-10-19T13:00:00+05:30');
 
 function getTimeLeft() {
   const now = new Date();
@@ -71,7 +71,7 @@ export default function CountdownTimer({ compact = false }) {
       <p className="mt-3" style={{ color: '#8899aa', fontSize: '0.85rem' }}>
         Draw Date:{' '}
         <span style={{ color: '#d4af37', fontWeight: 600 }}>
-          18 October 2026, 11:11 AM IST
+          19 October 2026, 1:00 PM IST
         </span>
       </p>
     </div>

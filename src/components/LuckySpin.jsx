@@ -102,7 +102,7 @@ export default function LuckySpin() {
                 One-Time Lock
               </div>
               <div style={{ color: '#7d8ea6', fontSize: '0.82rem', lineHeight: 1.6 }}>
-                The draw executes once on 18 October 2026 and cannot be rerun or altered.
+                The draw executes once on 19 October 2026 and cannot be rerun or altered.
               </div>
             </div>
           </div>

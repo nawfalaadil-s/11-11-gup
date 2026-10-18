@@ -70,8 +70,8 @@ export default function WinnersPage() {
             <h2 style={{ marginBottom: '0.75rem' }}>Draw Not Yet Conducted</h2>
             <p style={{ color: '#93a4bb', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: 1.7 }}>
               The lucky draw will be conducted on{' '}
-              <span className="text-gold" style={{ fontWeight: 600 }}>18 October 2026</span>{' '}
-              at 11:11 AM IST. Winners will appear here the moment the secure
+              <span className="text-gold" style={{ fontWeight: 600 }}>19 October 2026</span>{' '}
+              at 1:00 PM IST. Winners will appear here the moment the secure
               server-side draw completes.
             </p>
             <CountdownTimer />

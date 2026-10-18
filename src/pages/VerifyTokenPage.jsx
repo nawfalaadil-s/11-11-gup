@@ -230,7 +230,7 @@ export default function VerifyTokenPage() {
                 }}
               >
                 <p style={{ color: '#00d4ff', fontSize: '0.87rem' }}>
-                  Draw will be conducted on 18 October 2026
+                  Draw will be conducted on 19 October 2026
                 </p>
               </div>
             )}
